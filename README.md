@@ -1,18 +1,17 @@
 # ai-task-inbox
 
-スマホからGitHub Issueで作業を依頼し、AIが草案をIssueのコメントに返す指示箱です。
+スマホからGitHub Issueで作業を依頼し、ChatGPTの会話から作業を進める指示箱です。**この構成は追加のAI API課金を使いません。** 現在はIssueを作るだけではAIは自動起動しません。
 
 ## 使い方
 
-1. GitHubリポジトリの **Settings → Secrets and variables → Actions** に `OPENAI_API_KEY` を登録する。ChatGPT Plusとは別にOpenAI APIの利用設定と料金が必要です。キーをIssueやファイルに書かないでください。
-2. `main` にワークフローを反映すると、リポジトリ所有者が `【Instagram担当】` または `【読書担当】` で始まるIssueを新規作成したときに起動します。
-3. 既存Issueを試す場合は **Actions → Issue agent → Run workflow** で `issue_number` に `3` または `4` を入力します。異なるIssueの実行は別々のワークフローとして並行できます。
-4. 草案はIssueに「本人確認待ち」として返ります。内容を確認してから外部で使用します。Instagram投稿や本のスキャンは自動実行しません。
+1. スマホのChatGPTから、このリポジトリにIssueを作る。件名は `【Instagram担当】...` または `【読書担当】...` とする。
+2. 同じチャットで「`ai-task-inbox` のIssue #番号を進めて」と依頼する。統括の手順は [agents/coordinator.md](agents/coordinator.md)、担当別の手順は [Instagram](agents/instagram.md) と [読書](agents/reading.md) に記載している。
+3. AIが結果を会話に返す。Issueへ記録する場合は公開して問題ない内容か確認する。スマホやPCから結果をレビューする。
 
-## 統括の動き
+最初の依頼は [Instagram #3](https://github.com/zhiyandaqu-bit/ai-task-inbox/issues/3) と [読書 #4](https://github.com/zhiyandaqu-bit/ai-task-inbox/issues/4)。#3にはすでに投稿草案と投稿画面の進捗があるため、続きを行う際は既存コメントから再開する。
 
-統括はIssueの件名で担当を選び、依頼文をAIへ渡し、回答を元のIssueに１回だけコメントします。既知の担当名がない場合、他人のIssue、閉じたIssueは処理しません。再実行しても専用の印が付いたコメントがある場合は重複投稿しません。Issue #3 に既存コメントがあるため、試す前に内容を確認してください。
+## 料金と自動化
 
-公開リポジトリなので、Issue本文と返答も公開されます。個人情報、書籍本文、ログイン情報を含む依頼を登録しないでください。入力と出力の自動判定は万全ではありません。非公開の内容を扱う場合はリポジトリと実行設計を別途見直してください。
+GitHub Actionsや有料AI APIを使うワークフローは含めない。ChatGPT Plusでこの会話を使う範囲を想定する。GitHubのIssue作成をきっかけに無人でAIを実行する機能や、別のIssueを自動で並行処理する機能はない。自動化を追加する場合は、利用条件と費用を確認してから別途設計する。
 
-`OPENAI_MODEL` はワークフローの環境変数で変更できます。APIキーが未設定ならワークフローは失敗し、草案を投稿しません。
+このリポジトリは公開されているため、Issue本文やコメントに個人情報、ログイン情報、書籍本文を載せない。
