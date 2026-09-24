@@ -68,4 +68,4 @@ jobs:
               body: message + '\n\n※ この通知はGitHub Actionsの自動受付です。AIの作業はまだ始まっていません。'
             });
           })().catch(error => { console.error(error); process.exitCode = 1; });
-        NODE
+          NODE
