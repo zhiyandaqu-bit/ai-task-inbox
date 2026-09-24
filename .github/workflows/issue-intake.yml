@@ -17,12 +17,11 @@ jobs:
       - name: 担当を判定して受付を記録
         env:
           GH_TOKEN: ${{ github.token }}
-          EVENT_PATH: ${{ github.event_path }}
           REPOSITORY: ${{ github.repository }}
         run: |
           node <<'NODE'
           const fs = require('node:fs');
-          const event = JSON.parse(fs.readFileSync(process.env.EVENT_PATH, 'utf8'));
+          const event = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
           const title = event.issue.title;
           const routes = [
             {prefix: '【Instagram担当】', label: 'agent:instagram', guide: 'agents/instagram.md'},
