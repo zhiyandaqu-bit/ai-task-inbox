@@ -4,7 +4,7 @@
 
 ## 使い方
 
-1. [新しいIssue](https://github.com/zhiyandaqu-bit/ai-task-inbox/issues/new/choose)を作り、件名の先頭を `【Instagram担当】`、`【読書担当】`、`【LINEスタンプ担当】` のいずれかにする。依頼内容と完了条件を書く。
+1. [新しいIssue](https://github.com/zhiyandaqu-bit/ai-task-inbox/issues/new/choose)を作り、フォームで担当を選び、依頼内容と完了条件を書く。ChatGPTから直接Issueを作る場合は件名の先頭を `【Instagram担当】`、`【読書担当】`、`【LINEスタンプ担当】` のいずれかにする。
 2. Issueが作成されるとGitHub Actionsが受付コメントを付け、担当ラベルを付ける。これは受付だけで、AIによる本文の作業はまだ始まっていない。
 3. ChatGPTで「`ai-task-inbox の Issue #番号を進めて`」と依頼する。統括の手順は [agents/coordinator.md](agents/coordinator.md)、担当別の手順は [Instagram](agents/instagram.md)、[読書](agents/reading.md)、[LINEスタンプ](agents/line-sticker.md) にある。
 4. 会話で成果物を確認する。Issueへの記録が必要なら、公開してよい内容だけをコメントする。
