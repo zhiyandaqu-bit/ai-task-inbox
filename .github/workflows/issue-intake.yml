@@ -19,7 +19,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           EVENT_PATH: ${{ github.event_path }}
           REPOSITORY: ${{ github.repository }}
-        run: node <<'NODE'
+        run: |
+          node <<'NODE'
           const fs = require('node:fs');
           const event = JSON.parse(fs.readFileSync(process.env.EVENT_PATH, 'utf8'));
           const title = event.issue.title;
