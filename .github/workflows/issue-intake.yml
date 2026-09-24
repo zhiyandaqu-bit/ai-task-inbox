@@ -1,0 +1,68 @@
+name: Issue受付
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  intake:
+    if: github.event.issue.user.login == github.repository_owner
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: 担当を判定して受付を記録
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_PATH: ${{ github.event_path }}
+          REPOSITORY: ${{ github.repository }}
+        run: node <<'NODE'
+          const fs = require('node:fs');
+          const event = JSON.parse(fs.readFileSync(process.env.EVENT_PATH, 'utf8'));
+          const title = event.issue.title;
+          const routes = [
+            {prefix: '【Instagram担当】', label: 'agent:instagram', guide: 'agents/instagram.md'},
+            {prefix: '【読書担当】', label: 'agent:reading', guide: 'agents/reading.md'},
+            {prefix: '【LINEスタンプ担当】', label: 'agent:line-sticker', guide: 'agents/line-sticker.md'}
+          ];
+          const route = routes.find(item => title.startsWith(item.prefix));
+          const api = 'https://api.github.com/repos/' + process.env.REPOSITORY;
+          async function request(path, method, body) {
+            const res = await fetch(api + path, {
+              method,
+              headers: {
+                'Authorization': 'Bearer ' + process.env.GH_TOKEN,
+                'Accept': 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(body)
+            });
+            if (!res.ok) throw new Error(method + ' ' + path + ': ' + res.status + ' ' + await res.text());
+            return res.json();
+          }
+          (async () => {
+            if (route) {
+              const label = await request('/labels', 'GET');
+              if (!label.some(item => item.name === route.label)) {
+                await request('/labels', 'POST', {name: route.label, color: '0969da', description: '担当別の受付ラベル'});
+              }
+              await request('/issues/' + event.issue.number + '/labels', 'POST', {labels: [route.label]});
+            }
+            const message = route
+              ? '受付しました。担当: **' + route.prefix + '**（手順: ['
+                + route.guide + '](https://github.com/' + process.env.REPOSITORY + '/blob/main/'
+                + route.guide + ')）\\n\\n'
+                + 'AIで作業を始めるには、ChatGPTで「ai-task-inbox の Issue #'
+                + event.issue.number + ' を進めて」と依頼してください。作業結果は会話で確認できます。'
+              : '受付しました。担当を判定できませんでした。件名の先頭を `【Instagram担当】`、'
+                + '`【読書担当】`、`【LINEスタンプ担当】` のいずれかにして新しいIssueを作成するか、'
+                + 'ChatGPTでこの Issue の担当を指定してください。';
+            await request('/issues/' + event.issue.number + '/comments', 'POST', {
+              body: message + '\\n\\n※ この通知はGitHub Actionsの自動受付です。AIの作業はまだ始まっていません。'
+            });
+          })().catch(error => { console.error(error); process.exitCode = 1; });
+        NODE
