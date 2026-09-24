@@ -28,7 +28,7 @@ jobs:
             {prefix: '【読書担当】', label: 'agent:reading', guide: 'agents/reading.md'},
             {prefix: '【LINEスタンプ担当】', label: 'agent:line-sticker', guide: 'agents/line-sticker.md'}
           ];
-          const formOwner = event.issue.body?.match(/(?:^|\n)### 担当\\s*\n+([^\n]+)/)?.[1]?.trim();
+          const formOwner = event.issue.body?.match(/(?:^|\n)### 担当\s*\n+([^\n]+)/)?.[1]?.trim();
           const route = routes.find(item => title.startsWith(item.prefix))
             || routes.find(item => item.prefix.includes(formOwner) && formOwner);
           const api = 'https://api.github.com/repos/' + process.env.REPOSITORY;
