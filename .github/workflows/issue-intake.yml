@@ -28,7 +28,9 @@ jobs:
             {prefix: '【読書担当】', label: 'agent:reading', guide: 'agents/reading.md'},
             {prefix: '【LINEスタンプ担当】', label: 'agent:line-sticker', guide: 'agents/line-sticker.md'}
           ];
-          const route = routes.find(item => title.startsWith(item.prefix));
+          const formOwner = event.issue.body?.match(/(?:^|\n)### 担当\\s*\n+([^\n]+)/)?.[1]?.trim();
+          const route = routes.find(item => title.startsWith(item.prefix))
+            || routes.find(item => item.prefix.includes(formOwner) && formOwner);
           const api = 'https://api.github.com/repos/' + process.env.REPOSITORY;
           async function request(path, method, body) {
             const res = await fetch(api + path, {
@@ -55,14 +57,14 @@ jobs:
             const message = route
               ? '受付しました。担当: **' + route.prefix + '**（手順: ['
                 + route.guide + '](https://github.com/' + process.env.REPOSITORY + '/blob/main/'
-                + route.guide + ')）\\n\\n'
+                + route.guide + ')）\n\n'
                 + 'AIで作業を始めるには、ChatGPTで「ai-task-inbox の Issue #'
                 + event.issue.number + ' を進めて」と依頼してください。作業結果は会話で確認できます。'
               : '受付しました。担当を判定できませんでした。件名の先頭を `【Instagram担当】`、'
                 + '`【読書担当】`、`【LINEスタンプ担当】` のいずれかにして新しいIssueを作成するか、'
                 + 'ChatGPTでこの Issue の担当を指定してください。';
             await request('/issues/' + event.issue.number + '/comments', 'POST', {
-              body: message + '\\n\\n※ この通知はGitHub Actionsの自動受付です。AIの作業はまだ始まっていません。'
+              body: message + '\n\n※ この通知はGitHub Actionsの自動受付です。AIの作業はまだ始まっていません。'
             });
           })().catch(error => { console.error(error); process.exitCode = 1; });
         NODE
