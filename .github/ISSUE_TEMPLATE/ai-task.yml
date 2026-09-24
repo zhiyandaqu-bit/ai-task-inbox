@@ -1,12 +1,11 @@
 name: AI作業依頼
 description: 担当を選び、ChatGPTから進めるための依頼を作成します
-title: "【Instagram担当】"
 body:
   - type: dropdown
     id: owner
     attributes:
       label: 担当
-      description: 件名先頭も同じ担当名に変更してください
+      description: この選択から担当を自動判定します
       options:
         - Instagram担当
         - 読書担当
